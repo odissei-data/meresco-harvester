@@ -1,0 +1,10 @@
+{
+    "identifier": "IntegrationTest",
+    "name": {
+        "en": "IntegrationTest",
+        "nl": "IntegrationTest"
+    },
+    "repositoryIds": [
+        "integrationtest"
+    ]
+}

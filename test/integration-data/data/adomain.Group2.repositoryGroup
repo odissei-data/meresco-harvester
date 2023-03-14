@@ -1,0 +1,10 @@
+{
+    "identifier": "Group2",
+    "name": {
+        "en": "Group2",
+        "nl": "Groep2"
+    },
+    "repositoryIds": [
+        "repository2"
+    ]
+}

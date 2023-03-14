@@ -1,0 +1,11 @@
+{
+    "baseurl": "localhost",
+    "delegates": [],
+    "identifier": "SRUUPDATE",
+    "name": "SRUUPDATE",
+    "oaiEnvelope": false,
+    "path": "/dump",
+    "port": ${helperServerPortNumber},
+    "targetType": "sruUpdate",
+    "username": null
+}

@@ -1,0 +1,14 @@
+{
+    "action": null,
+    "baseurl": "http://localhost:${helperServerPortNumber}/oai",
+    "collection": "Integration",
+    "complete": false,
+    "identifier": "repository2",
+    "mappingId": "MAPPING",
+    "maximumIgnore": 5,
+    "metadataPrefix": "oai_dc",
+    "repositoryGroupId": "Group2",
+    "set": null,
+    "targetId": "SRUUPDATE",
+    "use": true
+}

@@ -1,0 +1,220 @@
+## begin license ##
+#
+# "Meresco Harvester" consists of two subsystems, namely an OAI-harvester and
+# a web-control panel.
+# "Meresco Harvester" is originally called "Sahara" and was developed for
+# SURFnet by:
+# Seek You Too B.V. (CQ2) http://www.cq2.nl
+#
+# Copyright (C) 2017 Seecr (Seek You Too B.V.) http://seecr.nl
+#
+# This file is part of "Meresco Harvester"
+#
+# "Meresco Harvester" is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# "Meresco Harvester" is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with "Meresco Harvester"; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
+## end license ##
+
+import page
+import common
+
+TYPES = dict(
+   sruUpdate="SRU Update Target",
+   filesystem="File System",
+   composite="Multiple Targets",
+)
+
+
+def main(**kwargs):
+    user = kwargs.get('session', {}).get('user')
+    domain = kwargs.get('session', {}).get('domain')
+    domainId = kwargs.get('arguments', {}).get('domainId', [None])[0]
+    if not user or (not user.isAdmin() and domain != domainId):
+        yield http.redirect("/login")
+        return
+    yield page.layoutWithMenu(_contents, **kwargs)
+
+
+def _contents(arguments, session, **kwargs):
+    identifier = arguments.get('identifier', [None])[0]
+    domainId = arguments.get('referrerDomain', [None])[0]
+
+    user = session.get('user')
+    target = observable.call.getTarget(identifier)
+
+    yield """<h1>Target Administration</h1>"""
+    yield common.showErrorMessage(arguments)
+    yield """
+    <div>
+        <h4>Target ({})</h4>""".format(escapeHtml(target.get('name') or '<No Name>'))
+    if user.isAdmin():
+        yield _adminView(target, domainId)
+    else:
+        yield _userView(target, domainId)
+    yield """
+    </div>
+    <p><a href="{domainEditLink}">Back to domain</a></p>""".format(
+        domainEditLink="/domain?{}".format(urlencode(dict(identifier=domainId))))
+
+
+def _adminView(target, domainId):
+    def _target_sruUpdate(target, domainId):
+        yield """
+            <tr>
+                <td>Base URL: (without &quot;http://&quot;)</td>
+                <td><input type="text" name="baseurl" value="{baseurl}" size="30"></td>
+            </tr>
+            <tr>
+                <td>Path:</td>
+                <td><input type="text" name="path" value="{path}" size="30"></td>
+            </tr>
+            <tr>
+                <td>Port:</td>
+                <td><input type="text" name="port" value="{port}" size="6"></td>
+            </tr>""".format(
+            baseurl=target.get('baseurl') or '',
+            path=target.get('path') or '',
+            port=target.get('port') or '')
+
+    def _target_filesystem(target, domainId):
+        yield """
+           <tr>
+               <td>Path:</td>
+               <td><input type="text" name="path" value="{path}'" size="30"></td>
+           </tr>
+           <tr>
+               <td>Wrap in OAI-Envelope:</td>
+               <td><input type="checkbox" name="oaiEnvelope" value="true" {checked}></td>
+           </tr>""".format(
+            path=target.get('path') or '',
+            checked='checked' if target.get('oaiEnvelope') else '')
+
+    def _target_composite(target, domainId):
+        targetId = target.get('identifier')
+        delegateIds = target.get('delegateIds', [])
+        targetIds = [each for each in observable.call.getDomain(domainId).get('targetIds', []) if each != targetId]
+        options = [(each, observable.call.getTarget(each).get('name') or '') for each in targetIds]
+
+        yield """
+            <tr>
+                <td style="vertical-align:top">Targets (hold CTRL/CMD to select multiple targets):</td>
+                <td>"""
+        yield common.dropdown(
+            name="delegate",
+            options=options,
+            selected=lambda key: key in delegateIds,
+            selectAttrs=dict(multiple="multiple", size=3))
+        yield """
+                </td>
+            </tr>"""
+
+    targetType = target.get('targetType')
+    targetTypes = dict(
+        sruUpdate=_target_sruUpdate,
+        filesystem=_target_filesystem,
+        composite=_target_composite)
+
+    yield """
+    <form method="post" action="/actions/updateTarget">
+        <input type="hidden" name="redirectUri" value="{targetEditLink}">
+        <table>
+            <input type="hidden" name="identifier" value="{identifier}">
+            <input type="hidden" name="targetType" value="{targetType}">
+            <tr>
+                <td>Name:</td>
+                <td><input type="text" name="name" value="{name}"></td>
+            </tr>
+            <tr>
+                <td>Type:</td>
+                <td>{targetTypeName}</td>
+            </tr>""".format(
+        targetEditLink="/target?{}".format(urlencode(dict(referrerDomain=domainId))),
+        identifier=target.get('identifier'),
+        targetType=targetType,
+        targetTypeName=TYPES.get(targetType, ''),
+        name=target.get('name') or '')
+
+    targetTypeRender = targetTypes.get(targetType)
+    if targetTypeRender:
+        yield targetTypeRender(target, domainId)
+
+    yield """
+        </table>
+        <p><input type="submit" name="action" class="butt" value="Save" accesskey="s"></p>
+    </form>"""
+
+
+def _userView(target, domainId):
+    def _target_sruUpdate(target, domainId):
+        for label, name in [("Base URL", 'baseurl'), ("Path", "path"), ("Port", "port")]:
+            yield """
+        <tr>
+            <td>{label}:</td>
+            <td>{value}</td>
+        </tr>""".format(label=label, value=target.get(name) or '')
+
+    def _target_filesystem(target, domainId):
+        yield """
+        <tr>
+            <td>Path:</td>
+            <td>{path}</td>
+        </tr>
+        <tr>
+            <td>Wrap in OAI-Envelope:</td>
+            <td>{oaiEnvelope}</td>
+        </tr>""".format(
+            path=target.get('path') or '',
+            oaiEnvelope="Yes" if target.get('oaiEnvelope') else "No")
+
+    def _target_composite(target, domainId):
+        yield """
+        <tr>
+            <td>Targets:</td>
+            <td></td>
+        </tr>"""
+        for id in target.get('delegateIds', []):
+            targetName = observable.call.getTarget(id).get('name') or ''
+            yield """
+        <tr>
+            <td>{targetName}</td>
+            <td><a href="{targetEditLink}">View</a></td>
+        </tr>""".format(
+                targetName=escapeHtml(targetName),
+                targetEditLink="/target?{}".format(urlencode(dict(identifier=id, referrerDomain=domainId))))
+
+    targetType = target.get('targetType')
+    targetTypes = dict(
+        sruUpdate=_target_sruUpdate,
+        filesystem=_target_filesystem,
+        composite=_target_composite)
+
+    yield """
+    <table>
+        <tr>
+            <td>Name:</td>
+            <td>{name}</td>
+        </tr>
+        <tr>
+            <td>Type:</td>
+            <td>{targetTypeName}</td>
+        </tr>""".format(
+        name=target.get('name') or '',
+        targetTypeName=TYPES.get(targetType, ''))
+
+    targetTypeRender = targetTypes.get(targetType)
+    if targetTypeRender:
+        yield targetTypeRender(target, domainId)
+
+    yield """
+    </table>"""

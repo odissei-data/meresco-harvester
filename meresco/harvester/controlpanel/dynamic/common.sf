@@ -1,0 +1,93 @@
+## begin license ##
+#
+# "Meresco Harvester" consists of two subsystems, namely an OAI-harvester and
+# a web-control panel.
+# "Meresco Harvester" is originally called "Sahara" and was developed for
+# SURFnet by:
+# Seek You Too B.V. (CQ2) http://www.cq2.nl
+#
+# Copyright (C) 2017 Seecr (Seek You Too B.V.) http://seecr.nl
+#
+# This file is part of "Meresco Harvester"
+#
+# "Meresco Harvester" is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# "Meresco Harvester" is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with "Meresco Harvester"; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
+## end license ##
+
+def main(**kwargs):
+    yield "Nothing to see here"
+
+
+def showStatusFor(domainId, scope, **kwargs):
+    def _arguments():
+        arguments = dict(domainId=domainId)
+        if kwargs:
+            arguments.update(kwargs)
+        return arguments
+
+    def _linkForPeriod(since):
+        arguments = _arguments()
+        arguments['since'] = since
+        return "/showHarvesterThroughput?{}".format(urlencode(arguments))
+
+    yield """
+<div>
+    <h3>Status</h3>
+    <ul>
+        <li><a href="{statusUrl}">Harvester status of this {scope}.</a> </li>
+        <li><a href="{past7DaysUrl}">Harvester throughput of this {scope} for the past 7 days.</a> </li>
+        <li><a href="{past31DaysUrl}">Harvester throughput of this {scope} for the past 31 days.</a> </li>
+    </ul>
+</div>""".format(
+        scope=scope,
+        statusUrl="/showHarvesterStatus?{}".format(urlencode(_arguments())),
+        past7DaysUrl=_linkForPeriod(since="lastweek"),
+        past31DaysUrl=_linkForPeriod(since="lastmonth"))
+
+
+def showErrorMessage(arguments):
+    error = arguments.get("error", [None])[0]
+    if error:
+        yield '<span class="error">{}</span>'.format(error)
+
+def showSessionError(session, key):
+    expandedKey = "error_{}".format(key)
+    if expandedKey in session:
+        yield '<span class="error">{}</span>'.format(session[expandedKey])
+        del session[expandedKey]
+
+def valueFromSession(session, key):
+    if 'saved_form_values' in session and key in session['saved_form_values']:
+        return session['saved_form_values'][key]
+    return ''
+
+def dropdown(name, options, selected, selectAttrs=None):
+    selectedCheck = (lambda value: value == selected) if not callable(selected) else selected
+
+    attributes = dict(name=name)
+    if selectAttrs:
+        attributes.update(selectAttrs)
+
+    yield """
+    <select {}>""".format(' '.join(['{}="{}"'.format(*item) for item in attributes.items()]))
+    for (key, value) in options:
+        yield """
+        <option value="{key}"{selected}>{value}</option>""".format(
+            key=escapeHtml(str(key)),
+            selected=" selected" if selectedCheck(key) else " ",
+            value=escapeHtml(str(value)))
+    yield """
+    </select>"""
+

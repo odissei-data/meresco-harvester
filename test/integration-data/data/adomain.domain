@@ -1,0 +1,11 @@
+{
+    "identifier": "adomain",
+    "mappingIds": [
+        "MAPPING"
+    ],
+    "repositoryGroupIds": [
+        "IntegrationTest",
+        "Group2"
+    ],
+    "targetIds": []
+}

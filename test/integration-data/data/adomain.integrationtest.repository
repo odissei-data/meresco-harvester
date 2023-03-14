@@ -1,0 +1,14 @@
+{
+    "action": null,
+    "baseurl": "http://localhost:${helperServerPortNumber}/oai",
+    "collection": "Integration",
+    "complete": false,
+    "identifier": "integrationtest",
+    "mappingId": "MAPPING",
+    "maximumIgnore": 5,
+    "metadataPrefix": "oai_dc",
+    "repositoryGroupId": "IntegrationTest",
+    "set": null,
+    "targetId": "SRUUPDATE",
+    "use": true
+}

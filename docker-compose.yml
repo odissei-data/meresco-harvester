@@ -1,0 +1,21 @@
+services:
+  meresco-harvester:
+    container_name: meresco-harvester
+    build: .
+    volumes:
+      - data-volume:/home/harvester/data
+      - ./bin:/app/bin
+      - ./home/harvester/log:/home/harvester/log
+      - state-volume:/home/harvester/state
+    environment:
+      PORT_NUMBER: 8888
+      DATA_PATH: /home/harvester/data
+      LOG_PATH: /home/harvester/log
+      STATE_PATH: /home/harvester/state
+      EXTERNAL_URL: http://localhost:8888
+
+    ports:
+      - '8888:8888'
+volumes:
+  data-volume:
+  state-volume:

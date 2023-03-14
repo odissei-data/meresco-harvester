@@ -1,0 +1,11 @@
+{
+    "baseurl": null,
+    "delegates": [],
+    "identifier": "FILESYSTEM",
+    "name": "FILESYSTEM",
+    "oaiEnvelope": false,
+    "path": "${integrationTempdir}/filesystem",
+    "port": 0,
+    "targetType": "filesystem",
+    "username": null
+}

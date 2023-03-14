@@ -1,0 +1,91 @@
+"Meresco Harvester" is the OAI-Harvester from the Meresco Suite 2005-2011
+
+http://www.meresco.org
+
+
+**********
+
+1. Installation
+---------------
+Seecr (Seek You Too B.V.) provides a Meresco Software repository to ease the installation of e.g. Meresco Harvester. For Debian and Redhat based systems see http://repository.seecr.nl for instructions to configure your package manager to use this repository.
+
+Installation using the Meresco Software Repository:
+    - install python-meresco-harvester with your package manager.
+
+For other systems or source based installation look at the 'deps.txt' file for all dependencies. Sources can be downloaded from http://meresco.org/sources
+Installation can be done with python distutils.
+    $ python setup.py install
+
+2. Configuration
+----------------
+Furthermore you will need to configure:
+    - sitecustomize.py !!
+    - webcontrolpanel administrator (admin)
+    - harvesting (user)
+
+2.1 SSL Certificate creation
+------------------------------
+    If you don't have an SSL Certificate for your server you can create your
+    own self-signed certificate.
+      Create a server key.
+        $ openssl genrsa -out server.pem 2048
+      Create a certificate. Fill in some information. BEWARE: As Common Name (CN)
+      fill in your domainname, e.g. harvester.example.org
+        $ openssl req -new -key server.pem -out server.csr
+      Now create a self-signed certificate.
+        $ openssl x509 -req -days 60 -in server.csr -signkey server.pem -out server.crt
+    In order to enable HTTPS, the usage of Nginx is highly suggested. 
+
+
+2.2 Sitecustomize.py !!
+-----------------------
+    "Meresco Harvester" requires 'utf-8' as defaultencodig. This can be
+    done with a file sitecustomize.py somewhere in your pythonpath. A usual
+    place for your sitecustomize.py is /usr/lib/python2.5/site-packages/
+    The contents should be:
+        import sys
+        sys.setdefaultencoding('utf-8')
+
+    The webcontrolpanel does not work if the encoding is different.
+
+2.3 Webcontrolpanel Configuration
+---------------------------------
+    To access the webcontrolpanel users will need a name and password. 
+    The special user 'admin' can create these. An initial password for this
+    user must also be created.
+
+2.3.1 Meresco Harvester Server
+------------------------------
+    An example configuration file is given in the examples directory, 
+    see 'harvester.config'.
+    We recommend using daemontools (http://cr.yp.to/daemontools.html) for
+    running this service.
+    The service is then started using the script 'meresco-harvester-server'.
+
+2.3.2 User administration
+-------------------------
+    The webcontrolpanel has one special user called 'admin', with extra privileges.
+    Amongst these privileges is the right to create users. This is all done
+    in the webcontrolpanel. 
+
+    Each user has it's own line in this file in the format:
+        <username>:<md5sum of password>
+
+    To start using the "Meresco Harvester" you will need to provide it with one
+    admin user, a default usersfile is in the example directory. It contains the
+    admin user with the password 'admin'.
+
+2.3.2.1 Changing the admin password
+---------------------------------
+    To create a password for the user admin you can do:
+      $ echo "admin:$(echo -n <yourpassword> | md5sum | awk '{print $1}')" > users.txt
+
+
+2.4 Harvesting configuration
+-----------------------------
+    Harvesting is done with the 'meresco-harvester' script.
+    The user that will run the 'meresco-harvester' script will need to have
+    read/write permissions in the stateDir and logDir specified in the
+    configuration.
+    
+

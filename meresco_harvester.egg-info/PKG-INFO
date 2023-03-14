@@ -1,0 +1,13 @@
+Metadata-Version: 2.1
+Name: meresco-harvester
+Version: -VERSION-
+Summary: "Meresco Harvester" consists of two subsystems, namely an OAI-harvester and a web-control panel.
+Home-page: http://www.meresco.org
+Author: Seecr
+Author-email: info@seecr.nl
+License: GNU Public License
+Platform: all
+License-File: COPYING
+
+"Meresco Harvester" consists of two subsystems, namely an OAI-harvester and a web-control panel.
+
