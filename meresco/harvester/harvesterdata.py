@@ -193,13 +193,16 @@ class HarvesterData(object):
         self._store.addData(domainId, 'domain', domain)
         return identifier
 
-    def updateTarget(self, identifier, name, username, port, targetType, delegateIds, path, baseurl, oaiEnvelope):
+    def updateTarget(self, identifier, name, username, port, targetType, delegateIds, path, baseurl, bucket, accessKey, secretKey, oaiEnvelope):
         target = self.getTarget(identifier)
         target['name'] = name
         target['username'] = username
         target['port'] = port
         target['targetType'] = targetType
         target['delegateIds'] = delegateIds
+        target['bucket'] = bucket
+        target['accessKey'] = accessKey
+        target['secretKey'] = secretKey
         target['path'] = path
         target['baseurl'] = baseurl
         target['oaiEnvelope'] = oaiEnvelope
