@@ -112,6 +112,10 @@ def _adminView(target, domainId):
                 <td><input type="text" name="bucket" value="{bucket}" size="30"></td>
             </tr>
             <tr>
+                <td>Path:</td>
+                <td><input type="text" name="path" value="{path}" size="30"></td>
+            </tr>
+            <tr>
                 <td>Access Key:</td>
                 <td><input type="text" name="accessKey" value="{accessKey}" size="30"></td>
             </tr>
@@ -121,6 +125,7 @@ def _adminView(target, domainId):
             </tr>""".format(
              baseurl=target.get('baseurl') or '',
              bucket=target.get('bucket') or '',
+             path=target.get('path') or '',
              accessKey=target.get('accessKey') or '',
              secretKey=target.get('secretKey') or '')
 
@@ -207,8 +212,13 @@ def _userView(target, domainId):
         <tr>
             <td>Bucket:</td>
             <td>{bucket}</td>
+        </tr>
+        <tr>
+            <td>Path:</td>
+            <td>{path}</td>
         </tr>""".format(
-            bucket=target.get('bucket') or '')
+            bucket=target.get('bucket') or '',
+            path=target.get('path') or '')
 
     def _target_composite(target, domainId):
         yield """

@@ -12,6 +12,7 @@ class S3Uploader(VirtualUploader):
         self.endpoint_url = target.baseurl
         self.access_key = target.accessKey
         self.secret_key = target.secretKey
+        self.path = target.path
         self.bucket_name = target.bucket
         self.s3 = boto3.client('s3',
                                endpoint_url=self.endpoint_url,
@@ -20,9 +21,10 @@ class S3Uploader(VirtualUploader):
 
     def send(self, anUpload):
         try:
+            file_name = anUpload.id.replace('/', '_')
             serialized_xml = tostring(anUpload.record)
             self.s3.put_object(Bucket=self.bucket_name,
-                               Key=anUpload.id,
+                               Key=self.path + '/' + file_name,
                                Body=serialized_xml)
         except ClientError as e:
             error_code = e.response['Error']['Code']
