@@ -3,9 +3,9 @@ services:
     container_name: meresco-harvester
     build: .
     volumes:
-      - data-volume:/home/harvester/data
       - ./bin:/app/bin
-      - ./home/harvester/log:/home/harvester/log
+      - log-volume:/home/harvester/log
+      - data-volume:/home/harvester/data
       - state-volume:/home/harvester/state
     environment:
       PORT_NUMBER: 8888
@@ -17,5 +17,6 @@ services:
     ports:
       - '8888:8888'
 volumes:
+  log-volume:
   data-volume:
   state-volume:

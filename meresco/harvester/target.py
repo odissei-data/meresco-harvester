@@ -39,6 +39,6 @@ from .saharaobject import SaharaObject
 
 class Target(SaharaObject):
     def __init__(self, id):
-        SaharaObject.__init__(self, ['baseurl', 'name', 'username', 'password',
+        SaharaObject.__init__(self, ['baseurl', 'name', 'username', 'password', 'bucket', "accessKey", "secretKey",
                                 'port', 'path', 'targetType', 'privateKey', 'command', 'hostname', 'oaiEnvelope'], ['delegate'])
         self.id = id

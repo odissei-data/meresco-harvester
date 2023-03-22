@@ -38,7 +38,5 @@ COPY ./usr-share/controlpanel /usr/share/meresco-harvester/controlpanel/
 RUN pip install -r deps.txt
 RUN python setup.py install
 
-RUN mkdir -p /home/harvester/{data,log,state}
-
 CMD ["/start.sh"]
 EXPOSE 8888

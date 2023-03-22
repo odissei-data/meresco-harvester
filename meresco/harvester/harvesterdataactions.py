@@ -189,6 +189,9 @@ class HarvesterDataActions(PostActions):
                 targetType=arguments.get('targetType', [''])[0],
                 path=arguments.get('path', [''])[0],
                 baseurl=arguments.get('baseurl', [''])[0],
+                bucket=arguments.get('bucket', [''])[0],
+                accessKey=arguments.get('accessKey', [''])[0],
+                secretKey=arguments.get('secretKey', [''])[0],
                 oaiEnvelope='oaiEnvelope' in arguments,
                 delegateIds=arguments.get('delegate',[]),
             )

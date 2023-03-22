@@ -32,6 +32,7 @@ import common
 TYPES = dict(
    sruUpdate="SRU Update Target",
    filesystem="File System",
+   s3Storage="S3 Storage Target",
    composite="Multiple Targets",
 )
 
@@ -100,6 +101,34 @@ def _adminView(target, domainId):
             path=target.get('path') or '',
             checked='checked' if target.get('oaiEnvelope') else '')
 
+    def _target_s3Storage(target, domainId):
+        yield """
+            <tr>
+                <td>Base URL:</td>
+                <td><input type="text" name="baseurl" value="{baseurl}" size="30"></td>
+            </tr>
+            <tr>
+                <td>Bucket:</td>
+                <td><input type="text" name="bucket" value="{bucket}" size="30"></td>
+            </tr>
+            <tr>
+                <td>Path:</td>
+                <td><input type="text" name="path" value="{path}" size="30"></td>
+            </tr>
+            <tr>
+                <td>Access Key:</td>
+                <td><input type="text" name="accessKey" value="{accessKey}" size="30"></td>
+            </tr>
+            <tr>
+                <td>Secret Key:</td>
+                <td><input type="password" name="secretKey" value="{secretKey}" size="30"></td>
+            </tr>""".format(
+             baseurl=target.get('baseurl') or '',
+             bucket=target.get('bucket') or '',
+             path=target.get('path') or '',
+             accessKey=target.get('accessKey') or '',
+             secretKey=target.get('secretKey') or '')
+
     def _target_composite(target, domainId):
         targetId = target.get('identifier')
         delegateIds = target.get('delegateIds', [])
@@ -123,6 +152,7 @@ def _adminView(target, domainId):
     targetTypes = dict(
         sruUpdate=_target_sruUpdate,
         filesystem=_target_filesystem,
+        s3Storage=_target_s3Storage,
         composite=_target_composite)
 
     yield """
@@ -177,6 +207,19 @@ def _userView(target, domainId):
             path=target.get('path') or '',
             oaiEnvelope="Yes" if target.get('oaiEnvelope') else "No")
 
+    def _target_s3Storage(target, domainId):
+        yield """
+        <tr>
+            <td>Bucket:</td>
+            <td>{bucket}</td>
+        </tr>
+        <tr>
+            <td>Path:</td>
+            <td>{path}</td>
+        </tr>""".format(
+            bucket=target.get('bucket') or '',
+            path=target.get('path') or '')
+
     def _target_composite(target, domainId):
         yield """
         <tr>
@@ -197,6 +240,7 @@ def _userView(target, domainId):
     targetTypes = dict(
         sruUpdate=_target_sruUpdate,
         filesystem=_target_filesystem,
+        s3Storage=_target_s3Storage,
         composite=_target_composite)
 
     yield """

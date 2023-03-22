@@ -98,10 +98,12 @@ class UploaderFactory(object):
         from .sruupdateuploader import SruUpdateUploader
         from .compositeuploader import CompositeUploader
         from .filesystemuploader import FileSystemUploader
+        from .s3uploader import S3Uploader
         self.mapping = {
             'sruUpdate': SruUpdateUploader,
             'composite': CompositeUploader,
-            'filesystem': FileSystemUploader
+            'filesystem': FileSystemUploader,
+            's3Storage': S3Uploader
             }
 
     def createUploader(self, target, logger, collection):
